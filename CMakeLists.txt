@@ -9,6 +9,9 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 find_package(SDL2 REQUIRED)
 option(WITH_SSE "Use highly optimized SSE FFT/MDCT routines" false)
 
+# Build clunk as a shared library by default
+set(BUILD_SHARED_LIBS ON CACHE BOOL INTERNAL)
+
 if ( NOT SDL2_FOUND )
 	message ( FATAL_ERROR "SDL2 not found!" )
 endif ( NOT SDL2_FOUND )
@@ -75,9 +78,8 @@ if(NOT HAVE_LOG2F_FUNCTION)
 	add_definitions(-DNEED_LOG2F)
 endif()
 
-add_library(clunk SHARED
-	${SOURCES}
-)
+message(STATUS "Build clunk as a shared library: ${BUILD_SHARED_LIBS}")
+add_library(clunk ${SOURCES})
 
 install(TARGETS clunk DESTINATION lib)
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/clunk)
