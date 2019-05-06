@@ -1,5 +1,5 @@
 project(clunk)
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.9)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
 include(CheckCXXSymbolExists)
 
@@ -11,6 +11,10 @@ option(WITH_SSE "Use highly optimized SSE FFT/MDCT routines" false)
 
 # Build clunk as a shared library by default
 set(BUILD_SHARED_LIBS ON CACHE BOOL INTERNAL)
+
+# For install like macports for easy dylibbundler
+set(CMAKE_SKIP_RPATH true)
+set(CMAKE_INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 
 if ( NOT SDL2_FOUND )
 	message ( FATAL_ERROR "SDL2 not found!" )
