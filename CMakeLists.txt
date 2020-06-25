@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.0)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
 include(CheckCXXSymbolExists)
 
+SET(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
+
 # modules
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -58,6 +60,8 @@ set(PUBLIC_HEADERS
 	clunk_c.h
 )
 
+SET(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ftree-vectorize -ffast-math")
 if (WITH_SSE)
 	set(SOURCES ${SOURCES} sse_fft_context.cpp)
 	add_definitions(-DCLUNK_USES_SSE)
