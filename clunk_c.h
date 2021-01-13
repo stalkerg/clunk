@@ -140,7 +140,7 @@ CLUNKCAPI void clunk_buffer_fill(clunk_buffer *buffer, int b);
 CLUNKCAPI void clunk_buffer_append(clunk_buffer *buffer, const clunk_buffer *other);
 CLUNKCAPI void clunk_buffer_append_data(clunk_buffer *buffer, const void *data, const size_t size);
 CLUNKCAPI void *clunk_buffer_reserve(clunk_buffer *buffer, int more);
-CLUNKCAPI const char *clunk_buffer_dump(clunk_buffer *buffer);
+CLUNKCAPI void clunk_buffer_dump(clunk_buffer *buffer, char *out, const size_t size);
 CLUNKCAPI void clunk_buffer_pop(clunk_buffer *buffer, size_t n);
 CLUNKCAPI void clunk_audio_lock(void);
 CLUNKCAPI void clunk_audio_unlock(void);
