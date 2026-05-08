@@ -240,12 +240,13 @@ void Context::init(const int sample_rate, const Uint8 channels, int period_size)
 	
 	this->period_size = period_size;
 	
-	if ( SDL_OpenAudio(&src, &spec) < 0 )
+	if ( SDL_OpenAudio(&src, NULL) < 0 )
 		throw_sdl(("SDL_OpenAudio(%d, %u, %d)", sample_rate, channels, period_size));
-	if (spec.format != AUDIO_S16SYS)
-		throw_ex(("SDL_OpenAudio(%d, %u, %d) returned format %d", sample_rate, channels, period_size, spec.format));
+	spec = src;
 	if (spec.channels < 2)
 		LOG_ERROR(("Could not operate on %d channels", spec.channels));
+	else if (spec.channels > 2)
+		throw_ex(("Clunk requires mono or stereo output, got %d channels", spec.channels));
 
 	LOG_DEBUG(("opened audio device, sample rate: %d, period: %d, channels: %d", spec.freq, spec.samples, spec.channels));
 	SDL_PauseAudio(0);
