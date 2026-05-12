@@ -31,16 +31,20 @@ namespace clunk {
 
 struct CLUNKAPI AudioLocker {
 	///locks audio 
-	AudioLocker () {
-		SDL_LockAudio();
-	}
+	AudioLocker();
+	explicit AudioLocker(SDL_AudioDeviceID device_id);
 	///unlocks audio 
-	~AudioLocker() {
-		SDL_UnlockAudio();
-	}
+	~AudioLocker();
+
+private:
+	SDL_AudioDeviceID device_id;
 };
+
+SDL_AudioDeviceID CLUNKAPI get_audio_device_id();
+void CLUNKAPI set_audio_device_id(SDL_AudioDeviceID device_id);
+void CLUNKAPI lock_audio();
+void CLUNKAPI unlock_audio();
 }
 
 
 #endif
-

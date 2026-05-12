@@ -137,6 +137,7 @@ public:
 
 private: 
 	SDL_AudioSpec spec;
+	SDL_AudioDeviceID device_id;
 	int period_size;
 
 	static void callback(void *userdata, Uint8 *stream, int len);
@@ -186,4 +187,3 @@ private:
 
 
 #endif
-

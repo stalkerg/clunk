@@ -1,5 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
 project(clunk)
-cmake_minimum_required(VERSION 3.9)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
 include(CheckCXXSymbolExists)
 
@@ -39,6 +39,7 @@ set(SOURCES
 	context.cpp
 	distance_model.cpp
 	kemar.c
+	locker.cpp
 	logger.cpp
 	object.cpp
 	sample.cpp
