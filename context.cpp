@@ -36,7 +36,7 @@
 
 using namespace clunk;
 
-Context::Context() : period_size(0), listener(NULL), max_sources(8), fx_volume(1), distance_model(DistanceModel::Inverse, true, 128), fdump(NULL) {
+Context::Context() : device_id(0), period_size(0), listener(NULL), max_sources(8), fx_volume(1), distance_model(DistanceModel::Inverse, true, 128), fdump(NULL) {
 }
 
 void Context::callback(void *userdata, Uint8 *bstream, int len) {
@@ -148,7 +148,7 @@ void Context::process(Sint16 *stream, int size) {
 			buf_size = size;
 
 		int sdl_v = (int)floor(SDL_MIX_MAXVOLUME * stream_info.gain + 0.5f);
-		SDL_MixAudio((Uint8 *)stream, (Uint8 *)stream_info.buffer.get_ptr(), buf_size, sdl_v);
+		SDL_MixAudioFormat((Uint8 *)stream, (Uint8 *)stream_info.buffer.get_ptr(), spec.format, buf_size, sdl_v);
 		
 		if ((int)stream_info.buffer.get_size() > size) {
 			memmove(stream_info.buffer.get_ptr(), ((Uint8 *)stream_info.buffer.get_ptr()) + size, stream_info.buffer.get_size() - size);
@@ -187,7 +187,7 @@ void Context::process(Sint16 *stream, int size) {
 		if (sdl_v > SDL_MIX_MAXVOLUME)
 			sdl_v = SDL_MIX_MAXVOLUME;
 		
-		SDL_MixAudio((Uint8 *)stream, (Uint8 *)buf.get_ptr(), size, sdl_v);
+		SDL_MixAudioFormat((Uint8 *)stream, (Uint8 *)buf.get_ptr(), spec.format, size, sdl_v);
 	}
 	
 	if (fdump != NULL) {
@@ -228,6 +228,11 @@ void Context::init(const int sample_rate, const Uint8 channels, int period_size)
 		if (SDL_InitSubSystem(SDL_INIT_AUDIO) == -1)
 			throw_sdl(("SDL_InitSubSystem"));
 	}
+
+	if (get_audio_device_id() != 0)
+		throw_ex(("audio device is already opened"));
+	if (channels > 2)
+		throw_ex(("Clunk requires mono or stereo output, got %d channels", channels));
 	
 	SDL_AudioSpec src;
 	memset(&src, 0, sizeof(src));
@@ -240,18 +245,33 @@ void Context::init(const int sample_rate, const Uint8 channels, int period_size)
 	
 	this->period_size = period_size;
 	
-	if ( SDL_OpenAudio(&src, &spec) < 0 )
-		throw_sdl(("SDL_OpenAudio(%d, %u, %d)", sample_rate, channels, period_size));
-	if (spec.format != AUDIO_S16SYS)
-		throw_ex(("SDL_OpenAudio(%d, %u, %d) returned format %d", sample_rate, channels, period_size, spec.format));
+	device_id = SDL_OpenAudioDevice(NULL, 0, &src, &spec, 0);
+	if (device_id == 0)
+		throw_sdl(("SDL_OpenAudioDevice(%d, %u, %d)", sample_rate, channels, period_size));
+	if (spec.format != AUDIO_S16SYS) {
+		Uint16 opened_format = spec.format;
+		SDL_AudioDeviceID opened_device_id = device_id;
+		device_id = 0;
+		SDL_CloseAudioDevice(opened_device_id);
+		throw_ex(("SDL_OpenAudioDevice(%d, %u, %d) returned format %d", sample_rate, channels, period_size, opened_format));
+	}
 	if (spec.channels < 2)
 		LOG_ERROR(("Could not operate on %d channels", spec.channels));
+	else if (spec.channels > 2) {
+		Uint8 opened_channels = spec.channels;
+		SDL_AudioDeviceID opened_device_id = device_id;
+		device_id = 0;
+		SDL_CloseAudioDevice(opened_device_id);
+		throw_ex(("Clunk requires mono or stereo output, got %d channels", opened_channels));
+	}
 
-	LOG_DEBUG(("opened audio device, sample rate: %d, period: %d, channels: %d", spec.freq, spec.samples, spec.channels));
-	SDL_PauseAudio(0);
-	
-	AudioLocker l;
-	listener = create_object();
+	set_audio_device_id(device_id);
+	LOG_DEBUG(("opened audio device %u, sample rate: %d, period: %d, channels: %d", (unsigned)device_id, spec.freq, spec.samples, spec.channels));
+	{
+		AudioLocker l;
+		listener = create_object();
+	}
+	SDL_PauseAudioDevice(device_id, 0);
 }
 
 void Context::delete_object(Object *o) {
@@ -266,10 +286,23 @@ void Context::deinit() {
 	if (!SDL_WasInit(SDL_INIT_AUDIO))
 		return;
 	
-	AudioLocker l;
-	delete listener;
-	listener = NULL;
-	SDL_CloseAudio();
+	SDL_AudioDeviceID opened_device_id = device_id;
+	if (opened_device_id != 0) {
+		SDL_PauseAudioDevice(opened_device_id, 1);
+		AudioLocker l(opened_device_id);
+		delete listener;
+		listener = NULL;
+	} else {
+		delete listener;
+		listener = NULL;
+	}
+
+	if (opened_device_id != 0) {
+		if (get_audio_device_id() == opened_device_id)
+			set_audio_device_id(0);
+		SDL_CloseAudioDevice(opened_device_id);
+		device_id = 0;
+	}
 	
 	if (fdump != NULL) {
 		fclose(fdump);

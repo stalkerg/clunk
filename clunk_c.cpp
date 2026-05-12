@@ -19,6 +19,7 @@
 */
 
 #include "context.h"
+#include "locker.h"
 #include "source.h"
 #include "stream.h"
 
@@ -455,12 +456,12 @@ CLUNKCAPI void clunk_buffer_pop(clunk_buffer *buffer, size_t n)
 
 CLUNKCAPI void clunk_audio_lock(void)
 {
-	SDL_LockAudio();
+	clunk::lock_audio();
 }
 
 CLUNKCAPI void clunk_audio_unlock(void)
 {
-	SDL_UnlockAudio();
+	clunk::unlock_audio();
 }
 
 CLUNKCAPI clunk_distance_model *clunk_distance_model_create(clunk_distance_model_type type, int clamped, float max_distance)
