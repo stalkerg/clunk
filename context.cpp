@@ -470,6 +470,12 @@ void Context::set_fx_volume(float volume) {
 		fx_volume = volume;
 }
 
+bool Context::set_paused(bool paused) {
+	if (audio_stream == NULL)
+		return true;
+	return paused ? SDL_PauseAudioStreamDevice(audio_stream) : SDL_ResumeAudioStreamDevice(audio_stream);
+}
+
 void Context::stop_all() {
 	AudioLocker l;
 	for(streams_type::iterator i = streams.begin(); i != streams.end(); ++i) {

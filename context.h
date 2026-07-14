@@ -113,6 +113,8 @@ public:
 		\param[in] volume volume of the 3d-sounds (global fx volume, 0.0 - 1.0)
 	*/
 	void set_fx_volume(float volume);
+	///Pauses or resumes the SDL3 audio stream owned by this context.
+	bool set_paused(bool paused);
 	/*!
 		\brief stops all sources.
 	*/
