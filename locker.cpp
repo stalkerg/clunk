@@ -19,40 +19,40 @@
 #include "locker.h"
 
 namespace {
-	SDL_AudioDeviceID current_audio_device_id = 0;
+	SDL_AudioStream *current_audio_stream = NULL;
 }
 
-SDL_AudioDeviceID clunk::get_audio_device_id() {
-	return current_audio_device_id;
+SDL_AudioStream *clunk::get_audio_stream() {
+	return current_audio_stream;
 }
 
-void clunk::set_audio_device_id(SDL_AudioDeviceID device_id) {
-	current_audio_device_id = device_id;
+void clunk::set_audio_stream(SDL_AudioStream *stream) {
+	current_audio_stream = stream;
 }
 
 void clunk::lock_audio() {
-	SDL_AudioDeviceID device_id = get_audio_device_id();
-	if (device_id != 0)
-		SDL_LockAudioDevice(device_id);
+	SDL_AudioStream *stream = get_audio_stream();
+	if (stream != NULL)
+		SDL_LockAudioStream(stream);
 }
 
 void clunk::unlock_audio() {
-	SDL_AudioDeviceID device_id = get_audio_device_id();
-	if (device_id != 0)
-		SDL_UnlockAudioDevice(device_id);
+	SDL_AudioStream *stream = get_audio_stream();
+	if (stream != NULL)
+		SDL_UnlockAudioStream(stream);
 }
 
-clunk::AudioLocker::AudioLocker() : device_id(get_audio_device_id()) {
-	if (device_id != 0)
-		SDL_LockAudioDevice(device_id);
+clunk::AudioLocker::AudioLocker() : stream(get_audio_stream()) {
+	if (stream != NULL)
+		SDL_LockAudioStream(stream);
 }
 
-clunk::AudioLocker::AudioLocker(SDL_AudioDeviceID device_id) : device_id(device_id) {
-	if (device_id != 0)
-		SDL_LockAudioDevice(device_id);
+clunk::AudioLocker::AudioLocker(SDL_AudioStream *stream) : stream(stream) {
+	if (stream != NULL)
+		SDL_LockAudioStream(stream);
 }
 
 clunk::AudioLocker::~AudioLocker() {
-	if (device_id != 0)
-		SDL_UnlockAudioDevice(device_id);
+	if (stream != NULL)
+		SDL_UnlockAudioStream(stream);
 }

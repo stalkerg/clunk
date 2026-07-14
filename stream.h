@@ -21,7 +21,7 @@
 
 
 #include "export_clunk.h"
-#include <SDL_audio.h>
+#include <SDL3/SDL_audio.h>
 
 namespace clunk {
 class Context;
@@ -29,7 +29,7 @@ class Buffer;
 
 /*! 
 	\brief Music/Ambient stream.
-	simple abstract class allowing you to play audio streams. Note that stream's methods will be called from the audio callback. 
+	simple abstract class allowing you to play audio streams. Note that stream's methods will be called from the SDL3 audio stream callback.
 	Usually it's the different thread context and if you're using any global variables from the stream code, you need to protect it with mutex
 	or clunk::AudioLocker. 
 */
@@ -57,7 +57,7 @@ protected:
 	int sample_rate;
 	///stream audio format 
 	/*! initialize it from your open() method */
-	Uint16 format;
+	SDL_AudioFormat format;
 	///stream channels. 
 	/*! initialize it from your open() method */
 	Uint8 channels;
@@ -67,4 +67,3 @@ protected:
 }
 
 #endif
-

@@ -2,3 +2,5 @@ The CLUNK C++ library provides support for real-time 3D(binaural) sound
 generation.
 
 This version uses by Vangers game.
+
+Building requires SDL 3.2 or newer and its CMake package configuration.

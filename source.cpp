@@ -20,7 +20,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "source.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include "clunk_ex.h"
 #include "buffer.h"
 #include "sample.h"
@@ -246,7 +246,7 @@ float Source::_process(clunk::Buffer &buffer, unsigned dst_ch, const v3<float> &
 	if (vol > 1)
 		vol = 1;
 
-	if (vol < 0 || (int)floor(SDL_MIX_MAXVOLUME * vol + 0.5f) <= 0) {
+	if (vol <= 0) {
 		_update_position((int)(dst_n * pitch));
 		return 0;
 	}

@@ -24,7 +24,7 @@
 #include <deque>
 #include <vector>
 #include <stdio.h>
-#include <SDL_audio.h>
+#include <SDL3/SDL_audio.h>
 
 #include "export_clunk.h"
 #include "object.h"
@@ -38,7 +38,7 @@ class Stream;
 
 /*! 
 	\brief Clunk context, main class for the audio output and mixing.
-	Main class for the clunk library. Holds audio callback and generates sound. 
+	Main class for the clunk library. Feeds an SDL3 audio stream and generates sound.
 	Also, mantains audio streams.
 */
 
@@ -50,7 +50,7 @@ public:
 		\brief Initializes clunk context. 
 		\param[in] sample_rate sample rate of the audio output
 		\param[in] channels audio output channels number, supported values 1 or 2 for now. 
-		\param[out] period_size minimal processing unit (bytes). Less period - less latency.
+		\param[in] period_size minimum mixer block size in sample frames. SDL3 controls the device buffer size.
 	*/
 	void init(int sample_rate, const Uint8 channels, int period_size);
 	/*! 
@@ -123,10 +123,10 @@ public:
 		\param[out] dst destination data
 		\param[in] src source data
 		\param[in] rate sample rate of the source data
-		\param[in] format SDL audio format. See SDL_audio.h or SDL documentation for the details.
+		\param[in] format SDL audio format. See SDL3/SDL_audio.h or SDL documentation for the details.
 		\param[in] channels source channels. 
 	*/
-	void convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, const Uint16 format, const Uint8 channels);
+	void convert(clunk::Buffer &dst, const clunk::Buffer &src, int rate, SDL_AudioFormat format, const Uint8 channels);
 	
 	///returns object associated to the current listener position
 	Object *get_listener() { return listener; }
@@ -137,10 +137,12 @@ public:
 
 private: 
 	SDL_AudioSpec spec;
-	SDL_AudioDeviceID device_id;
+	SDL_AudioStream *audio_stream;
+	bool initialized_audio_subsystem;
 	int period_size;
+	clunk::Buffer callback_buffer;
 
-	static void callback(void *userdata, Uint8 *stream, int len);
+	static void SDLCALL callback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
 	void delete_object(Object *o);
 
 	friend clunk::Object::~Object();
@@ -150,9 +152,11 @@ private:
 	objects_type objects;
 	
 	struct stream_info {
-		stream_info() : stream(NULL), loop(false), gain(1.0f), paused(false), buffer() {}
+		stream_info() : stream(NULL), converter(NULL), loop(false), ended(false), gain(1.0f), paused(false), buffer() {}
 		Stream *stream;
+		SDL_AudioStream *converter;
 		bool loop;
+		bool ended;
 		float gain;
 		bool paused;
 		clunk::Buffer buffer;

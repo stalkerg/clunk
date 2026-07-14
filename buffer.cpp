@@ -17,6 +17,7 @@
 */
 
 #include "buffer.h"
+#include <SDL3/SDL_stdinc.h>
 #include <stdlib.h>
 #include <string.h>
 #include "clunk_ex.h"
@@ -122,7 +123,7 @@ void* Buffer::reserve(const int more) {
 void Buffer::free() {
 	if (ptr != NULL) {
 		if (is_sdl_buffer)
-			SDL_FreeWAV((Uint8*)ptr);
+			SDL_free(ptr);
 		else
 			::free(ptr);
 		ptr = NULL;

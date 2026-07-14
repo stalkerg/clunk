@@ -19,29 +19,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#include <SDL_audio.h>
+#include <SDL3/SDL_audio.h>
 #include "export_clunk.h"
 namespace clunk {
 
 /*! 
-	\brief Audio callback locker
+	\brief Audio stream callback locker
 	This struct locks audio in ctor and releases lock from the dtor. 
-	This prevents audio callback from being called while clunk::AudioLocker is in the scope. 
+	This prevents the SDL3 audio stream callback from being called while clunk::AudioLocker is in the scope.
 */
 
 struct CLUNKAPI AudioLocker {
 	///locks audio 
 	AudioLocker();
-	explicit AudioLocker(SDL_AudioDeviceID device_id);
+	explicit AudioLocker(SDL_AudioStream *stream);
 	///unlocks audio 
 	~AudioLocker();
 
 private:
-	SDL_AudioDeviceID device_id;
+	SDL_AudioStream *stream;
 };
 
-SDL_AudioDeviceID CLUNKAPI get_audio_device_id();
-void CLUNKAPI set_audio_device_id(SDL_AudioDeviceID device_id);
+SDL_AudioStream * CLUNKAPI get_audio_stream();
+void CLUNKAPI set_audio_stream(SDL_AudioStream *stream);
 void CLUNKAPI lock_audio();
 void CLUNKAPI unlock_audio();
 }

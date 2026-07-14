@@ -5,10 +5,7 @@ include(CheckCXXSymbolExists)
 
 SET(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
 
-# modules
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
-find_package(SDL2 REQUIRED)
+find_package(SDL3 3.2 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 option(WITH_SSE "Use highly optimized SSE FFT/MDCT routines" false)
 
 # Build clunk as a shared library by default
@@ -17,10 +14,6 @@ set(BUILD_SHARED_LIBS ON CACHE BOOL INTERNAL)
 # For install like macports for easy dylibbundler
 set(CMAKE_SKIP_RPATH true)
 set(CMAKE_INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-
-if ( NOT SDL2_FOUND )
-	message ( FATAL_ERROR "SDL2 not found!" )
-endif ( NOT SDL2_FOUND )
 
 set(clunk_VERSION_MAJOR 1)
 set(clunk_VERSION_MINOR 0)
@@ -31,7 +24,6 @@ endif(WIN32)
 
 add_definitions(-DCLUNKAPI=DLLEXPORT)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-include_directories(${SDL2_INCLUDE_DIR})
 
 set(SOURCES 
 	buffer.cpp
@@ -89,8 +81,12 @@ endif()
 
 message(STATUS "Build clunk as a shared library: ${BUILD_SHARED_LIBS}")
 add_library(clunk ${SOURCES})
+target_include_directories(clunk PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+	$<INSTALL_INTERFACE:include/clunk>
+)
 
 install(TARGETS clunk DESTINATION lib)
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/clunk)
 
-target_link_libraries(clunk ${SDL2_LIBRARY})
+target_link_libraries(clunk PUBLIC SDL3::SDL3)
