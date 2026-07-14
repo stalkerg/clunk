@@ -86,7 +86,11 @@ target_include_directories(clunk PUBLIC
 	$<INSTALL_INTERFACE:include/clunk>
 )
 
-install(TARGETS clunk DESTINATION lib)
+install(TARGETS clunk
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+)
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/clunk)
 
 target_link_libraries(clunk PUBLIC SDL3::SDL3)
