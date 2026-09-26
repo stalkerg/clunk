@@ -20,7 +20,7 @@
 */
 
 
-#include <SDL_audio.h>
+#include <SDL3/SDL_audio.h>
 #include "export_clunk.h"
 #include "buffer.h"
 
@@ -42,10 +42,10 @@ public:
 		\brief initializes sample
 		\param[in] data raw audio data
 		\param[in] rate sample rate
-		\param[in] format SDL audio format. Look SDL_audio.h or SDL documentation. 
+		\param[in] format SDL audio format. See SDL3/SDL_audio.h or SDL documentation.
 		\param[in] channels audio channels
 	*/	
-	void init(const clunk::Buffer &data, int rate, const Uint16 format, const Uint8 channels);
+	void init(const clunk::Buffer &data, int rate, SDL_AudioFormat format, const Uint8 channels);
 	/*!
 		\brief loads sample from file
 	*/
@@ -77,4 +77,3 @@ private:
 }
 
 #endif
-

@@ -23,7 +23,6 @@
 #include <sys/types.h>
 #include <string>
 #include <iostream>
-#include <SDL.h>
 #include "export_clunk.h"
 
 namespace clunk {

@@ -17,7 +17,7 @@
 */
 
 #include "sdl_ex.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 using namespace clunk;
 

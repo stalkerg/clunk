@@ -23,7 +23,7 @@
 #endif
 #include <math.h>
 
-#include <SDL_audio.h>
+#include <SDL3/SDL_audio.h>
 #include "export_clunk.h"
 #include "v3.h"
 #include "mdct_context.h"

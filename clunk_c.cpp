@@ -91,7 +91,7 @@ CLUNKCAPI void clunk_context_set_fx_volume(clunk_context *ctx, float volume)
 
 CLUNKCAPI void clunk_context_convert(clunk_context *ctx, clunk_buffer *dst, clunk_buffer *src, int rate, const Uint16 format, const Uint8 channels)
 {
-	ctx->convert(*dst, *src, rate, format, channels);
+	ctx->convert(*dst, *src, rate, static_cast<SDL_AudioFormat>(format), channels);
 }
 
 CLUNKCAPI clunk_object *clunk_context_get_listener(clunk_context *ctx)
@@ -245,7 +245,7 @@ CLUNKCAPI void clunk_sample_set_pitch(clunk_sample *smp, float pitch)
 
 CLUNKCAPI void clunk_sample_init(clunk_sample *smp, clunk_buffer *data, int rate, Uint16 format, Uint8 channels)
 {
-	smp->init(*data, rate, format, channels);
+	smp->init(*data, rate, static_cast<SDL_AudioFormat>(format), channels);
 }
 
 CLUNKCAPI void clunk_sample_load(clunk_sample *smp, const char *file)

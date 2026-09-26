@@ -19,7 +19,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include <SDL_rwops.h>
+#include <SDL3/SDL_audio.h>
 #include "sample.h"
 #include "sdl_ex.h"
 #include "context.h"
@@ -54,7 +54,7 @@ void Sample::generateSine(const int freq, const float len) {
 	LOG_DEBUG(("generated %u bytes", (unsigned)data.get_size()));
 }
 
-void Sample::init(const clunk::Buffer &src_data, int rate, const Uint16 format, const Uint8 channels) {
+void Sample::init(const clunk::Buffer &src_data, int rate, SDL_AudioFormat format, const Uint8 channels) {
 	AudioLocker l;
 
 	spec.freq = context->get_spec().freq;
@@ -66,13 +66,12 @@ void Sample::init(const clunk::Buffer &src_data, int rate, const Uint16 format, 
 void Sample::load(const std::string &file) {
 	Uint8 *buf;
 	Uint32 len;
-	//SDL_AudioSpec * SDLCALL SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);
-	if (SDL_LoadWAV(file.c_str(), &spec, &buf, &len) == NULL)
+	if (!SDL_LoadWAV(file.c_str(), &spec, &buf, &len))
 		throw_sdl(("SDL_LoadWav"));
 	//std::cout<<"buf:"<<(void *)buf<<std::endl;
 	clunk::Buffer wav;
-	wav.is_sdl_buffer = true;
 	wav.set_data(buf, len, true);
+	wav.is_sdl_buffer = true;
 	context->convert(data, wav, spec.freq, spec.format, spec.channels);
 	
 	name = file;
