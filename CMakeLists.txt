@@ -68,12 +68,18 @@ set(PUBLIC_HEADERS
 	clunk_c.h
 )
 
-SET(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ftree-vectorize -ffast-math")
+if (MSVC)
+	add_compile_options("$<$<COMPILE_LANGUAGE:C,CXX>:/utf-8>")
+else()
+	SET(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ftree-vectorize -ffast-math")
+endif()
 if (WITH_SSE)
 	set(SOURCES ${SOURCES} sse_fft_context.cpp)
 	add_definitions(-DCLUNK_USES_SSE)
-	add_definitions(-msse2)
+	if (NOT MSVC)
+		add_definitions(-msse2)
+	endif()
 endif(WITH_SSE)
 
 check_cxx_symbol_exists(pow10f "math.h" HAVE_POW10F_FUNCTION)
