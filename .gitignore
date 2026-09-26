@@ -3,3 +3,5 @@ Makefile
 cmake_*.cmake
 *.so
 test
+build/
+install/
