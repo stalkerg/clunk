@@ -22,7 +22,6 @@ if(WIN32)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_WINDOWS)
 endif(WIN32)
 
-add_definitions(-DCLUNKAPI=DLLEXPORT)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
 set(SOURCES 
@@ -87,6 +86,7 @@ endif()
 
 message(STATUS "Build clunk as a shared library: ${BUILD_SHARED_LIBS}")
 add_library(clunk ${SOURCES})
+target_compile_definitions(clunk PRIVATE CLUNKAPI=DLLEXPORT)
 target_include_directories(clunk PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 	$<INSTALL_INTERFACE:include/clunk>
@@ -107,4 +107,19 @@ if(BUILD_TESTING)
 	target_include_directories(fft_roundtrip_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 	target_compile_features(fft_roundtrip_test PRIVATE cxx_std_11)
 	add_test(NAME fft_roundtrip COMMAND fft_roundtrip_test)
+
+	add_executable(buffer_dump_test tests/buffer_dump_test.c)
+	target_link_libraries(buffer_dump_test PRIVATE clunk)
+	if(NOT BUILD_SHARED_LIBS)
+		target_compile_definitions(buffer_dump_test PRIVATE CLUNKAPI=)
+	endif()
+	add_test(NAME buffer_dump COMMAND buffer_dump_test)
+	# This project disables RPATH, so tests must find the just-built library.
+	if(APPLE)
+		set_tests_properties(buffer_dump PROPERTIES
+			ENVIRONMENT "DYLD_LIBRARY_PATH=$<TARGET_FILE_DIR:clunk>:$ENV{DYLD_LIBRARY_PATH}")
+	elseif(UNIX)
+		set_tests_properties(buffer_dump PROPERTIES
+			ENVIRONMENT "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:clunk>:$ENV{LD_LIBRARY_PATH}")
+	endif()
 endif()

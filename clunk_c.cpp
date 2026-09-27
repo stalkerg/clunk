@@ -444,9 +444,13 @@ CLUNKCAPI void *clunk_buffer_reserve(clunk_buffer *buffer, int more)
 	return buffer->reserve(more);
 }
 
-CLUNKCAPI const char *clunk_buffer_dump(clunk_buffer *buffer)
+CLUNKCAPI void clunk_buffer_dump(clunk_buffer *buffer, char *out, size_t capacity)
 {
-	return buffer->dump().c_str();
+	if (capacity == 0)
+		return;
+	const std::string dump = buffer->dump();
+	const size_t copied = dump.copy(out, capacity - 1);
+	out[copied] = '\0';
 }
 
 CLUNKCAPI void clunk_buffer_pop(clunk_buffer *buffer, size_t n)

@@ -140,7 +140,11 @@ CLUNKCAPI void clunk_buffer_fill(clunk_buffer *buffer, int b);
 CLUNKCAPI void clunk_buffer_append(clunk_buffer *buffer, const clunk_buffer *other);
 CLUNKCAPI void clunk_buffer_append_data(clunk_buffer *buffer, const void *data, const size_t size);
 CLUNKCAPI void *clunk_buffer_reserve(clunk_buffer *buffer, int more);
-CLUNKCAPI const char *clunk_buffer_dump(clunk_buffer *buffer);
+/* Copy the buffer dump into caller-owned storage. capacity includes the trailing
+ * null byte. If capacity is zero, nothing is written and out may be NULL.
+ * Otherwise out must point to at least capacity bytes; the output is truncated
+ * if needed and always null-terminated. buffer must be valid. */
+CLUNKCAPI void clunk_buffer_dump(clunk_buffer *buffer, char *out, size_t capacity);
 CLUNKCAPI void clunk_buffer_pop(clunk_buffer *buffer, size_t n);
 CLUNKCAPI void clunk_audio_lock(void);
 CLUNKCAPI void clunk_audio_unlock(void);
