@@ -40,10 +40,10 @@ private:
 	SDL_AudioStream *stream;
 };
 
-SDL_AudioStream * CLUNKAPI get_audio_stream();
-void CLUNKAPI set_audio_stream(SDL_AudioStream *stream);
-void CLUNKAPI lock_audio();
-void CLUNKAPI unlock_audio();
+CLUNKAPI SDL_AudioStream *get_audio_stream();
+CLUNKAPI void set_audio_stream(SDL_AudioStream *stream);
+CLUNKAPI void lock_audio();
+CLUNKAPI void unlock_audio();
 }
 
 
