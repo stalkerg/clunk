@@ -100,3 +100,11 @@ install(TARGETS clunk
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/clunk)
 
 target_link_libraries(clunk PUBLIC SDL3::SDL3)
+
+include(CTest)
+if(BUILD_TESTING)
+	add_executable(fft_roundtrip_test tests/fft_roundtrip_test.cpp)
+	target_include_directories(fft_roundtrip_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+	target_compile_features(fft_roundtrip_test PRIVATE cxx_std_11)
+	add_test(NAME fft_roundtrip COMMAND fft_roundtrip_test)
+endif()
